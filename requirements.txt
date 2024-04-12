@@ -1,0 +1,6 @@
+testcontainers==3.7.1
+redis==5.0.3
+pytest==7.4.4
+psycopg2==2.9.3
+fastapi==0.108.0
+uvicorn==0.15.0
