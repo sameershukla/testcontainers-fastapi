@@ -30,5 +30,5 @@ services:
       - postgres-data:/var/lib/postgresql/data
 
 volumes:
-  redis-data:  # Optional volume for Redis data persistence
-  postgres-data:  # Optional volume for PostgreSQL data persistence
+  redis-data:
+  postgres-data:

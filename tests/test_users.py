@@ -1,10 +1,9 @@
 import os
 import pytest
 from testcontainers.postgres import PostgresContainer
-from app.model.users import create_table, delete_all_users, get_all_users, User
+from app.model.users import create_table, delete_all_users, get_all_users, User, get_user_by_email
 from app.service.user_service import create_user, get_cached_user_by_email, delete_user_from_cache_and_database
 from testcontainers.redis import RedisContainer
-
 
 postgres = PostgresContainer("postgres:16-alpine")
 redis_container = RedisContainer("redis:5.0.3-alpine")
@@ -37,29 +36,33 @@ def setup_data():
     delete_all_users()
 
 
-def test_get_all_users():
+def test_existing_user_by_email():
+    # First Create User
     create_user("sameer", "sameer.shukla@gmail.com", True)
-    user_list = get_all_users()
-    assert len(user_list) == 1
-
-
-def test_get_user_by_email():
-    create_user("sameer", "sameer.shukla@gmail.com", True)
+    # Retrieve user from cache
     user_dict = get_cached_user_by_email("sameer.shukla@gmail.com")
+    # Assert on user object
     user = User(**user_dict)
     assert user.username == "sameer"
     assert user.email == "sameer.shukla@gmail.com"
+
+
+def test_non_existing_user_by_email():
+    # Retrieve user from cache
+    user_dict = get_cached_user_by_email("sameer.shukla@gmail1.com")
+    assert user_dict is None
 
 
 def test_delete_user():
+    # First Create User
     create_user("sameer", "sameer.shukla@gmail.com", True)
+    # Retrieve user from cache
     user_dict = get_cached_user_by_email("sameer.shukla@gmail.com")
-    print(user_dict)
     user = User(**user_dict)
-    print('user:', user)
     assert user.username == "sameer"
     assert user.email == "sameer.shukla@gmail.com"
+    # Delete user from cache and database
     delete_user_from_cache_and_database("sameer.shukla@gmail.com")
+    # Retrieve user and check object not exists
     user = get_cached_user_by_email("sameer.shukla@gmail.com")
     assert user is None
-

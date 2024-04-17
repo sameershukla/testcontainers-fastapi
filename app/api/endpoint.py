@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from app.model.users import User
-from app.service.user_service import get_user_by_email, create_user, delete_user_from_cache_and_database, get_cached_user_by_email
+from app.service.user_service import create_user, delete_user_from_cache_and_database, get_cached_user_by_email
 
 router = APIRouter()
 
@@ -26,6 +26,7 @@ def delete_user(email: str):
     user = get_cached_user_by_email(email)
     if user is not None:
         delete_user_from_cache_and_database(email)
+    raise HTTPException(status_code=404, detail="User Not Found")
 
 
 def objToDict(user: User):
